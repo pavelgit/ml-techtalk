@@ -30,15 +30,11 @@ class DataProvider:
         output_np_array = np.load('output_np_array.npy')
         return input_np_array, output_np_array
 
-    def read_examples_arrays_without_occupations(self, examples):
-        input_arrays = list(map(lambda example: self._get_example_input_array_without_occupation(example), examples))
-        output_arrays = list(map(lambda example: self._get_example_output_array_without_occupation(example), examples))
+    def read_examples_inputs_arrays_without_occupations(self, examples):
+        return list(map(lambda example: self._get_example_input_array_without_occupation(example), examples))
 
-        input_np_array = np.array(input_arrays, dtype=np.float32)
-        output_np_array = np.array(output_arrays, dtype=np.float32)
-
-        return input_np_array, output_np_array
-
+    def read_examples_exists_outputs_arrays(self, examples):
+        return list(map(lambda example: self._get_example_exists_output_array(example), examples))
 
     def _get_example_input_array_without_occupation(self, example):
         return [
@@ -84,9 +80,14 @@ class DataProvider:
             example['input']['salutation']['frau'],
         ]
 
-    def _get_example_output_array_without_occupation(self, example):
+    def _get_example_output_array(self, example):
         return [
             example['result']['exists'],
             example['result']['netPrice'],
             example['result']['grossPrice']
+        ]
+
+    def _get_example_exists_output_array(self, example):
+        return [
+            example['result']['exists']
         ]

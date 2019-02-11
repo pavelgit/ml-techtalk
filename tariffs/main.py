@@ -9,5 +9,5 @@ model_provider = NoOccupationPresenceModelProvider()
 model_provider.model.fit(
     inputs,
     outputs,
-    epochs=1000,
+    epochs=1000, batch_size=512
 )
