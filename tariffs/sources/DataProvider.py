@@ -68,12 +68,23 @@ class DataProvider:
         output_np_array = np.load('output_np_array.npy')
         return input_np_array, output_np_array
 
-    def split_examples(self, examples):
-        train_len = int(len(examples) * 0.8)
-        return examples[0:train_len], examples[train_len:]
+    def split_examples(self, inputs, outputs):
+        assert len(inputs) == len(outputs)
+        p = np.random.permutation(len(inputs))
+        shuffled_inputs = inputs[p]
+        shuffled_outputs = outputs[p]
+        train_len = int(len(inputs) * 0.8)
+        
+        train_inputs = shuffled_inputs[0:train_len]
+        train_outputs = shuffled_outputs[0:train_len]
+        
+        test_inputs = shuffled_inputs[train_len:]
+        test_outputs = shuffled_outputs[train_len:]
+        
+        return train_inputs, train_outputs, test_inputs, test_outputs
 
     def read_examples_inputs_arrays_without_occupations(self, examples):
-        return list(map(lambda example: list(self._get_example_input_array_without_occupation(example)), examples))
+        return list(map(lambda example: list(self.get_example_input_array_without_occupation(example)), examples))
 
     def read_examples_exists_outputs_arrays(self, examples):
         return list(map(lambda example: list(self._get_example_exists_output_array(example)), examples))
@@ -81,7 +92,7 @@ class DataProvider:
     def read_examples_net_outputs_arrays(self, examples):
         return list(map(lambda example: list(self._get_example_net_output_array(example)), examples))
 
-    def _get_example_input_array_without_occupation(self, example):
+    def get_example_input_array_without_occupation(self, example):
         yield from self._generate_one_hot(example['input']['familyStatus'], self.FAMILY_STATUS_OPTIONS)
         yield from self._generate_one_hot(example['input']['educationType'], self.EDUCATION_TYPE_OPTIONS)
         yield from self._generate_one_hot(example['input']['jobSituation'], self.JOB_SITUATION_OPTIONS)
@@ -91,6 +102,7 @@ class DataProvider:
         yield example['input']['benefitAmount']
         yield example['input']['fractionOfficeWork']
         yield example['input']['staffResponsibility']
+
         yield example['input']['smoker']
 
         yield from self._generate_datetime_attributes(example['input']['birthday'])
