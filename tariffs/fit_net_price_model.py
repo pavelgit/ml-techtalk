@@ -4,7 +4,10 @@ from keras.callbacks import TensorBoard
 import time
 
 data_provider = DataProvider()
-inputs, outputs = data_provider.load_from_file()
+
+inputs = data_provider.load_from_file('net_price_model_inputs.npy')
+outputs = data_provider.load_from_file('net_price_model_outputs.npy')
+
 train_inputs, train_outputs, test_inputs, test_outputs = data_provider.split_examples(inputs, outputs)
 
 model_provider = NoOccupationNetModelProvider()

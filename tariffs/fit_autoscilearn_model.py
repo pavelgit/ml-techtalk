@@ -1,9 +1,7 @@
 import sklearn.model_selection
 import sklearn.datasets
 import sklearn.metrics
-from joblib import dump
-from google.colab import files
-
+from sources.DataProvider import DataProvider
 import autosklearn.regression
 
 from keras.callbacks import TensorBoard
@@ -34,10 +32,6 @@ def main():
     print("mean_absolute_error:", sklearn.metrics.mean_absolute_error(y_test, predictions))
     print("median_absolute_error:", sklearn.metrics.median_absolute_error(y_test, predictions))
     print("explained_variance_score:", sklearn.metrics.explained_variance_score(y_test, predictions))
-    
-    dump(automl, 'model.joblib')
-    files.download('model.joblib')
-
 
 if __name__ == '__main__':
     main()

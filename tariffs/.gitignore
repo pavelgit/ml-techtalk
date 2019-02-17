@@ -1,6 +1,5 @@
 .idea
 .vscode
-*.npy
 venv
 *.pyc
 logs

@@ -1,5 +1,5 @@
 from keras.layers import Input, Dense, BatchNormalization, Activation
-from keras.models import Model
+from keras.models import Model, load_model
 from keras import optimizers
 from sources.DataProvider import DataProvider
 
@@ -16,8 +16,7 @@ class NoOccupationPresenceModelProvider:
         x = x_input
 
         x = BatchNormalization()(x)
-        x = Dense(100)(x)
-        x = Dense(100)(x)
+        x = Dense(1000)(x)
         x = Dense(1, activation='sigmoid')(x)
 
         self.model = Model(inputs=x_input, outputs=x)
@@ -25,4 +24,8 @@ class NoOccupationPresenceModelProvider:
         optimizer = optimizers.Adam(lr=0.01)
         self.model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
+    def save(self):
+        self.model.save('precence_model.h5')
 
+    def load(self):
+        self.model = load_model('precence_model.h5')

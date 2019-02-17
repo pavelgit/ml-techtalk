@@ -59,14 +59,11 @@ class DataProvider:
                 if progress % 1000 == 0:
                     print('Progress', math.floor(1.0 * progress / count * 100.0))
 
-    def save_to_file(self, input_np_array, output_np_array):
-        np.save('input_np_array.npy', input_np_array)
-        np.save('output_np_array.npy', output_np_array)
+    def save_to_file(self, file_name, array):
+        np.save(file_name, array)
 
-    def load_from_file(self):
-        input_np_array = np.load('input_np_array.npy')
-        output_np_array = np.load('output_np_array.npy')
-        return input_np_array, output_np_array
+    def load_from_file(self, file_name):
+        return np.load(file_name)
 
     def split_examples(self, inputs, outputs):
         assert len(inputs) == len(outputs)

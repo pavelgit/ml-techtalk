@@ -30,13 +30,13 @@ class TariffPrice(Resource):
 
         input_data = data_provider.get_example_input_array_without_occupation(np.array(args))
         output_data = model_provider.model.predict(input_data)
-        net_price = output_data[0]
+        my_net_price = output_data[0]
 
         autosklearn_output_data = autosklearn_model.predict(np.array([args]))
         autosklearn_net_price = autosklearn_output_data[0][0]
 
         response = {
-            net_price: net_price,
+            my_net_price: my_net_price,
             autosklearn_net_price: autosklearn_net_price
         }
         return response, 200
