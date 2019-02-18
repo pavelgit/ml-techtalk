@@ -2,15 +2,20 @@ from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from sources.DataProvider import DataProvider
 from sources.NoOccupationNetModelProvider import NoOccupationNetModelProvider
+from sources.NoOccupationPresenceModelProvider import NoOccupationPresenceModelProvider
 from joblib import load
 import numpy as np
 
 app = Flask(__name__)
 api = Api(app)
 data_provider = DataProvider()
-model_provider = NoOccupationNetModelProvider()
-model_provider.load()
-autosklearn_model = load('model.joblib')
+presence_model_provider = NoOccupationPresenceModelProvider()
+presence_model_provider.load()
+
+net_price_model_provider = NoOccupationNetModelProvider()
+net_price_model_provider.load()
+
+autosklearn_model = load('autosklearn_model.joblib')
 
 class TariffPrice(Resource):
     def post(self, name):
@@ -29,14 +34,14 @@ class TariffPrice(Resource):
         args = parser.parse_args()
 
         input_data = data_provider.get_example_input_array_without_occupation(np.array(args))
-        output_data = model_provider.model.predict(input_data)
-        my_net_price = output_data[0]
 
-        autosklearn_output_data = autosklearn_model.predict(np.array([args]))
-        autosklearn_net_price = autosklearn_output_data[0][0]
+        is_present = presence_model_provider.model.predict(input_data)[0]
+        net_price = net_price_model_provider.model.predict(input_data)[0]
+        autosklearn_net_price = autosklearn_model.predict(np.array([args]))[0][0]
 
         response = {
-            my_net_price: my_net_price,
+            is_present: is_present,
+            net_price: net_price,
             autosklearn_net_price: autosklearn_net_price
         }
         return response, 200
