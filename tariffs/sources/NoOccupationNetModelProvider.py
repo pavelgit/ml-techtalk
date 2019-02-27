@@ -4,12 +4,12 @@ from keras.models import Model, load_model
 from keras import optimizers
 import keras.backend as K
 from keras import regularizers
+from sources.DataProvider import DataProvider
+import keras.metrics
 
 def max_abs_error(y_true, y_pred):
     return K.max(K.abs(y_true-y_pred))
-
-def error_power_8(y_true, y_pred):
-    return K.mean((y_true-y_pred)**8)
+    
 
 class NoOccupationNetModelProvider:
 
@@ -39,7 +39,9 @@ class NoOccupationNetModelProvider:
         self.model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['mean_absolute_error', max_abs_error])
 
     def save(self):
-        self.model.save('model.h5')
+        self.model.save('models/net_price_model.h5')
 
     def load(self):
-        self.model = load_model('model.h5')
+        keras.metrics.max_abs_error = max_abs_error
+        self.model = load_model('models/net_price_model.h5')
+        self.model._make_predict_function()

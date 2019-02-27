@@ -8,5 +8,5 @@ examples = list(filter(lambda example: example['input']['occupation'] == 'Erzieh
 inputs = data_provider.read_examples_inputs_arrays_without_occupations(examples)
 outputs = data_provider.read_examples_exists_outputs_arrays(examples)
 
-data_provider.save_to_file('presence_model_inputs.npy', inputs)
-data_provider.save_to_file('presence_model_outputs.npy', outputs)
+data_provider.save_to_file('sets/presence_model_inputs.npy', inputs)
+data_provider.save_to_file('sets/presence_model_outputs.npy', outputs)

@@ -81,29 +81,29 @@ class DataProvider:
         return train_inputs, train_outputs, test_inputs, test_outputs
 
     def read_examples_inputs_arrays_without_occupations(self, examples):
-        return list(map(lambda example: list(self.get_example_input_array_without_occupation(example)), examples))
+        return list(map(lambda example: list(self.get_example_input_array_without_occupation(example['input'])), examples))
 
     def read_examples_exists_outputs_arrays(self, examples):
-        return list(map(lambda example: list(self._get_example_exists_output_array(example)), examples))
+        return list(map(lambda example: list(self._get_example_exists_output_array(example['output'])), examples))
 
     def read_examples_net_outputs_arrays(self, examples):
-        return list(map(lambda example: list(self._get_example_net_output_array(example)), examples))
+        return list(map(lambda example: list(self._get_example_net_output_array(example['output'])), examples))
 
     def get_example_input_array_without_occupation(self, example):
-        yield from self._generate_one_hot(example['input']['familyStatus'], self.FAMILY_STATUS_OPTIONS)
-        yield from self._generate_one_hot(example['input']['educationType'], self.EDUCATION_TYPE_OPTIONS)
-        yield from self._generate_one_hot(example['input']['jobSituation'], self.JOB_SITUATION_OPTIONS)
-        yield from self._generate_one_hot(example['input']['industry'], self.INDUSTRY_OPTIONS)
+        yield from self._generate_one_hot(example['familyStatus'], self.FAMILY_STATUS_OPTIONS)
+        yield from self._generate_one_hot(example['educationType'], self.EDUCATION_TYPE_OPTIONS)
+        yield from self._generate_one_hot(example['jobSituation'], self.JOB_SITUATION_OPTIONS)
+        yield from self._generate_one_hot(example['industry'], self.INDUSTRY_OPTIONS)
 
-        yield example['input']['benefitAgeLimit']
-        yield example['input']['benefitAmount']
-        yield example['input']['fractionOfficeWork']
-        yield example['input']['staffResponsibility']
+        yield example['benefitAgeLimit']
+        yield example['benefitAmount']
+        yield example['fractionOfficeWork']
+        yield example['staffResponsibility']
 
-        yield example['input']['smoker']
+        yield example['smoker']
 
-        yield from self._generate_datetime_attributes(example['input']['birthday'])
-        yield from self._generate_datetime_attributes(example['input']['insuranceStart'])
+        yield from self._generate_datetime_attributes(example['birthday'])
+        yield from self._generate_datetime_attributes(example['insuranceStart'])
 
     def _generate_one_hot(self, value, possible_values):
         yield from (possible_value == value for possible_value in possible_values)
@@ -117,17 +117,17 @@ class DataProvider:
 
     def _get_example_output_array(self, example):
         return [
-            example['output']['exists'],
-            example['output']['net'],
-            example['output']['gross']
+            example['exists'],
+            example['net'],
+            example['gross']
         ]
 
     def _get_example_exists_output_array(self, example):
         return [
-            example['output']['exists']
+            example['exists']
         ]
 
     def _get_example_net_output_array(self, example):
         return [
-            example['output']['net']
+            example['net']
         ]

@@ -25,7 +25,7 @@ class NoOccupationPresenceModelProvider:
         self.model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
     def save(self):
-        self.model.save('precence_model.h5')
+        self.model.save('models/precence_model.h5')
 
     def load(self):
-        self.model = load_model('precence_model.h5')
+        self.model = load_model('models/precence_model.h5')

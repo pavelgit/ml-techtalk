@@ -1,51 +1,52 @@
-from flask import Flask
-from flask_restful import Api, Resource, reqparse
+from flask import Flask, request, jsonify
 from sources.DataProvider import DataProvider
 from sources.NoOccupationNetModelProvider import NoOccupationNetModelProvider
 from sources.NoOccupationPresenceModelProvider import NoOccupationPresenceModelProvider
 from joblib import load
 import numpy as np
+import logging, sys
+import datetime
+import tensorflow as tf
+from flask_cors import CORS
 
-app = Flask(__name__)
-api = Api(app)
 data_provider = DataProvider()
+
 presence_model_provider = NoOccupationPresenceModelProvider()
 presence_model_provider.load()
 
 net_price_model_provider = NoOccupationNetModelProvider()
 net_price_model_provider.load()
 
-autosklearn_model = load('autosklearn_model.joblib')
+graph = tf.get_default_graph()
 
-class TariffPrice(Resource):
-    def post(self, name):
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+app = Flask(__name__)
+CORS(app)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("familyStatus")
-        parser.add_argument("educationType")
-        parser.add_argument("jobSituation")
-        parser.add_argument("industry")
-        parser.add_argument("benefitAgeLimit")
-        parser.add_argument("benefitAmount")
-        parser.add_argument("fractionOfficeWork")
-        parser.add_argument("staffResponsibility")
-        parser.add_argument("birthday")
-        parser.add_argument("insuranceStart")
-        args = parser.parse_args()
+@app.route('/tariff-prices', methods=['POST'])
+def calculate_prices():
+    request_data = dict(request.get_json())
 
-        input_data = data_provider.get_example_input_array_without_occupation(np.array(args))
+    request_data['benefitAgeLimit'] = int(request_data['benefitAgeLimit'])
+    request_data['benefitAmount'] = int(request_data['benefitAmount'])
+    request_data['fractionOfficeWork'] = int(request_data['fractionOfficeWork'])
+    request_data['staffResponsibility'] = int(request_data['staffResponsibility'])
 
-        is_present = presence_model_provider.model.predict(input_data)[0]
-        net_price = net_price_model_provider.model.predict(input_data)[0]
-        autosklearn_net_price = autosklearn_model.predict(np.array([args]))[0][0]
+    request_data['birthday'] = datetime.datetime.strptime(request_data['birthday'], '%Y-%m-%d')
+    request_data['insuranceStart'] = datetime.datetime.strptime(request_data['insuranceStart'], '%Y-%m-%d')
+    input_data = list(data_provider.get_example_input_array_without_occupation(request_data))
 
-        response = {
-            is_present: is_present,
-            net_price: net_price,
-            autosklearn_net_price: autosklearn_net_price
-        }
-        return response, 200
-      
-api.add_resource(TariffPrice, "/tariff-prices/")
+    global graph
+    is_present = None
+    with graph.as_default():
+        is_present = float(presence_model_provider.model.predict(np.array([input_data], dtype=float))[0][0])
+        net_price = float(net_price_model_provider.model.predict(np.array([input_data], dtype=float))[0][0])
+
+    response = {
+        'is_present': is_present,
+        'net_price': net_price
+    }
+
+    return jsonify(response), 200
 
 app.run(debug=True)

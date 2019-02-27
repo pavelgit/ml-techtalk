@@ -5,8 +5,8 @@ import time
 
 data_provider = DataProvider()
 
-inputs = data_provider.load_from_file('presence_model_inputs.npy')
-outputs = data_provider.load_from_file('presence_model_outputs.npy')
+inputs = data_provider.load_from_file('sets/presence_model_inputs.npy')
+outputs = data_provider.load_from_file('sets/presence_model_outputs.npy')
 train_inputs, train_outputs, test_inputs, test_outputs = data_provider.split_examples(inputs, outputs)
 
 model_provider = NoOccupationPresenceModelProvider()
@@ -23,5 +23,3 @@ model_provider.model.fit(
     validation_data=(test_inputs, test_outputs),
     callbacks=[tensor_board]
 )
-
-model_provider.save()
